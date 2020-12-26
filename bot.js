@@ -10,7 +10,8 @@ function fetchStatusHandler(response) {
   if (response.status === 200) {
     return response;
   }
-  throw new Error(response);
+
+  throw new Error(response.status);
 }
 
 client.once("ready", () => {
@@ -22,7 +23,7 @@ client.on("message", async (message) => {
     return;
   }
 
-  if (!message.content.startsWith(COMMAND_PREFIX) || message.content == "/h") {
+  if (!message.content.startsWith(COMMAND_PREFIX) || message.content === "/h") {
     message.channel.send("Format of command is /send @<username_here>");
     return;
   }
@@ -38,29 +39,32 @@ client.on("message", async (message) => {
   const [userId, ...rest] = mentions;
 
   try {
-    const { code, remaining_vouchers } = await fetch(`${BACKEND}/vouchers`, {
+    const { voucher, availableCount } = await fetch(`${BACKEND}/voucher`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId,
         channel,
       }),
-    });
+    })
+      .then(fetchStatusHandler)
+      .then((res) => res.json());
+
+    await sendMessage(voucher, userId);
+    message.channel.send(
+      `Successful allocation. Vouchers left: ${availableCount}`
+    );
   } catch (error) {
-    if (error.status == 400) {
+    if (error.message === "404") {
       message.channel.send(`User has already been allocated a voucher`);
+    } else if (error.message === "403") {
+      message.channel.send(`No more vouchers left to allocate`);
     } else {
       message.channel.send(
         "Oops, you shouldn't be seeing this...., please do let an organizer know this happened"
       );
     }
-
-    return;
   }
-
-  console.log(`Remaining: ${remaining_vouchers}`);
-  await sendMessage(code, userId);
-  message.channel.send("Successfully allocated Voucher.");
 });
 
 client.login(process.env.BOT_TOKEN);
