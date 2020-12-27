@@ -60,7 +60,6 @@ app.post("/voucher", async (req, res) => {
     availableCount = vouchersLeftResult.rows[0].count;
     await client.query("COMMIT");
 
-    console.log("Almost done", voucher, availableCount);
     res.status(200).json({ availableCount, voucher });
   } catch (error) {
     await client.query("ROLLBACK");
