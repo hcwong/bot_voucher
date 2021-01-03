@@ -36,8 +36,8 @@ client.on("message", async (message) => {
     return;
   }
 
-  console.log(message.mentions.users);
   const [userId, ...rest] = mentions;
+  const username = mentions[userId].username;
 
   try {
     const { voucher, availableCount } = await fetch(`${BACKEND}/voucher`, {
@@ -53,18 +53,20 @@ client.on("message", async (message) => {
 
     await sendMessage(voucher, userId);
     message.channel.send(
-      `Successful allocation. Vouchers left: ${availableCount}`
+      `Successful allocation to ${username}. Vouchers left: ${availableCount}`
     );
   } catch (error) {
     if (error.message === "404") {
       message.channel.send(`No More Available Vouchers`);
     } else if (error.message === "403") {
-      message.channel.send(`User has already been allocated a voucher`);
+      message.channel.send(
+        `User ${username} has already been allocated a voucher`
+      );
     } else if (error.message === "406") {
       message.channel.send(`This channel has run out of vouchers`);
     } else if (error.message === "401") {
       message.channel.send(
-        `User has already been allocated 2 vouchers across all channels`
+        `User ${username} has already been allocated 2 vouchers across all channels`
       );
     } else {
       message.channel.send(
