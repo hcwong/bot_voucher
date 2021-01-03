@@ -84,7 +84,7 @@ app.post("/voucher", async (req, res) => {
     const vouchersLeftResult = await client.query(selectChannelCountQuery, [
       channel,
     ]);
-    availableCount = vouchersLeftResult.rows[0].count;
+    availableCount = CHANNEL_LIMIT - vouchersLeftResult.rows[0].count;
     await client.query("COMMIT");
 
     res.status(200).json({ availableCount, voucher });
