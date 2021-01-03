@@ -36,6 +36,7 @@ client.on("message", async (message) => {
     return;
   }
 
+  console.log(mentions);
   const [userId, ...rest] = mentions;
 
   try {
@@ -56,9 +57,15 @@ client.on("message", async (message) => {
     );
   } catch (error) {
     if (error.message === "404") {
-      message.channel.send(`User has already been allocated a voucher`);
+      message.channel.send(`No More Available Vouchers`);
     } else if (error.message === "403") {
-      message.channel.send(`No more vouchers left to allocate`);
+      message.channel.send(`User has already been allocated a voucher`);
+    } else if (error.message === "406") {
+      message.channel.send(`This channel has run out of vouchers`);
+    } else if (error.message === "401") {
+      message.channel.send(
+        `User has already been allocated 2 vouchers across all channels`
+      );
     } else {
       message.channel.send(
         "Oops, you shouldn't be seeing this...., please do let an organizer know this happened"
