@@ -37,7 +37,7 @@ client.on("message", async (message) => {
   }
 
   const [userId, ...rest] = mentions;
-  const username = mentions[userId].username;
+  const username = message.mentions.users.get(userId).username;
 
   try {
     const { voucher, availableCount } = await fetch(`${BACKEND}/voucher`, {
