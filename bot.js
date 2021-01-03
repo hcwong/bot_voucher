@@ -36,7 +36,7 @@ client.on("message", async (message) => {
     return;
   }
 
-  console.log(mentions);
+  console.log(message.mentions.users);
   const [userId, ...rest] = mentions;
 
   try {
