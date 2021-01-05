@@ -66,7 +66,7 @@ app.post("/voucher", async (req, res) => {
     }
 
     // Check if user has more than 2 vouchers
-    const userCountResult = await client.query(selectUserCountQuery, [channel]);
+    const userCountResult = await client.query(selectUserCountQuery, [userId]);
     if (userCountResult.rows[0].count >= USER_LIMIT) {
       throw new Error(ERR_USER_MAXED);
     }
@@ -100,6 +100,7 @@ app.post("/voucher", async (req, res) => {
     } else if (error.message === ERR_USER_ALLOCATED) {
       res.sendStatus(403);
     } else {
+      console.log(`Error occured with userId ${userId}.`, error);
       res.sendStatus(500);
     }
   } finally {
